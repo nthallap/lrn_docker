@@ -1,0 +1,178 @@
+1. docker --version
+
+2. docker info ---> to know about docker
+
+3. docker run
+
+	docker run <image_name> --> to run a container
+	docker run hello-world  
+	
+	docker run -d <image_name>  --> run in detach mode means will give you prompt
+	docker run hello-world 
+
+	docker run <image_name>  <override_default_command>  --> to override defatult command
+	docker run busybox ls
+
+	docker run -p<laptop_port>:<container_port> -d <image>  --> to bind the with laptop_port
+	docker run -p6000:5247 -d redit	
+
+	docker run --name <give_name_to_container> <image_name>  --> to give a name to a container
+
+	docker run -d -p27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin  -e MONGO_INITDB_ROOT_PASSWORD=password --name=mongodb --net mongo_network mongo
+	
+	docker run -d -p8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=password --name mondb_express -e ME_CONFIG_MONGODB_SERVER=mongodb --net mongo_network mongo-express
+
+	#below are the some of the parameters we can use for docker run
+	-e is used to set environment variable
+ 	--net to specify the network
+ 	-p to bind the host port with docker port
+ 	-v <host_path>:<container_path>  to create volumes
+ 	--name to specify the name of the container
+ 
+4. docker ps 
+	docker ps ----> to show the only running containers
+	docker ps -a  --> to get the list of containers(or --all)
+
+5. docker pull
+	docker pull hello-world  --> to pull a image
+	ex : docker image pull ubuntu:latest
+
+6. docker image 
+	docker image ls  --> to get the list of images
+	docker images  --> to get the list of images
+
+7. docker rmi
+	docker rmi <image_id> --> to remove image
+
+8. docker rm
+	docker rm <container_id>  --> to remove containter 
+
+9. docker create
+	docker create <image>  --> It will create a container and return a container id
+	ex: docker create busybox
+	# we can specify defatult command for this docker create command
+	ex : docker create busybox echo How are you ?
+	# here echo How are you? is the defatult command for this container
+
+10. docker start
+	docker start -a <retrund_id_by> --> to start that container already exist 
+	# -a will print the oupput to the terminal
+	# we can not change defatult command for already exited container
+	# we can restart the already exited container also by using docker start
+	ex : docker start 12abx34yxd
+		 docker start -a 12abx34yxd
+
+11. docker stop
+	docker stop <container_id> --> to stop the docker container
+	# docker stop will issue a SIGTERM terminate signal to kernal. 
+	# It will take it's own time to stop the container
+	# if container taking more than 10 seconds of time to stop the container then it will change to docker kill automaticall
+	ex : docker stop a2c89b610f1b
+
+12. docker kill
+	docker kill <container_id> --> to stop the docker cotainer immidiatly
+	# docker kill will issue a SIGKILL kill signal to kernal. 
+	# It will kill  the container immidiatly
+	ex : docker kill a2c89b610f1b
+	
+13. docker logs
+	docker logs <container_id/container_name> --> to get the logs in that docker
+	#we can get the logs from already exited container also
+
+14. docker exec 
+	docker exec -it <container_id/container_name> <command>  ----> to execute some commands in running container
+	#it flag is using to get interactive terminal 
+	docker exec -it 1f82068e07ef  ls
+	docker exec -it 1f82068e07ef  /bin/bash
+
+15. docker system
+    docker system prune --> to remove all container / image cache / network / dangling image
+	docker system prune --all
+	docker system prune -a --volumes
+
+16. docker commit
+	docker commit -c "CMD '<cmd-name>'" <containter_id> <repo:tag>
+	# docker commit is using to create a docker image out of a running container
+
+17. docker build
+	#docker build is using to build a Dockerfile
+	#we can specify more than one tag in docker build command
+	docker build -t <docker_hub_username>/<app_name>:<tag> .
+	docker build --build-arg HTTPS_PROXY=https://my-proxy.example.com .
+	#we can pass ARG to Dockerfile by using --build-arg
+
+18. docker login
+	docker login -u <user_name> -p <password>  --> to login docker
+	docker login <machine_ip>:<port> --> to login to local harbor registry
+
+19. docker tag
+	#to create a tag for the local image
+	docker tag  locacl_image:tag  <docker_user_name>/<container_name>:<tag>
+
+20. docker push
+	#to push docker image to docker hub repository
+	docker push <docker_user_name>/<container_name>:<tag> 
+
+21. docker inspect
+	#to get the network or ip detais of that container
+	docker inspect <container_id>
+
+22. docker-compose
+	docker-compose -f <yaml_file> <up/down>
+	docker-compose <yaml_file> up --build --> to rebuild the docker image again
+	docker-compose up -d --> run in detach mode
+	docker-compose ps ---> to check the running container
+
+23. docker volume
+	docker volume create <vol_name> --> to create a volumes
+	docker volume  ls --> to get the list of volumes
+	docker volume inspect <volume_name> --> to get the info about the volume
+
+restart policy in docker-compose.yaml yaml file
+we are sttting a policy to restart a container automaticall as below
+by defatult is no
+restart : "no" / always / on-failure / unless-stooped
+
+
+docker network ls  --> to know the list of docker networks
+
+docker network create <network_name>  --> to create a docker network
+
+
+
+=======
+docker rm -vf $(docker ps -aq)
+docker rmi -f $(docker images -aq)
+docker system prune --all
+
+To load docker images for tar file
+--------------
+docker load -i <tar_file>.tar.gz
+
+=========
+
+to install docker using scripts
+---------
+ curl -fsSL https://get.docker.com -o get-docker.sh
+ sudo sh get-docker.sh
+ 
+ 
+ ==========
+ docker proxy
+https://www.serverlab.ca/tutorials/containers/docker/how-to-set-the-proxy-for-docker-on-ubuntu/
+
+sudo mkdir -p /etc/systemd/system/docker.service.d
+/etc/systemd/system/docker.service.d/proxy.conf
+
+[Service]
+Environment="HTTP_PROXY=http://proxy-iind.intel.com:911"
+Environment="HTTPS_PROXY=http://proxy-iind.intel.com:911"
+Environment="NO_PROXY=localhost,127.0.0.1,::1,intel.com,192.168.57.0/24,192.168.60.0/24,10.0.0.0/8,134.134.0.0/16,.kubevirt.svc,195.8.0.0/24,10.10.0.0/24,10.20.0.0/24,10.96.0.0/24,195.48.0.0/24"
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
+
+=======
+
+
+
