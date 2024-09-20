@@ -8,6 +8,7 @@
 	docker run hello-world  
 	
 	docker run -d <image_name>  --> run in detach mode means will give you prompt
+    docker attach <container_id> --> to attach container back to terminal
 	docker run hello-world 
 
 	docker run <image_name>  <override_default_command>  --> to override defatult command
@@ -18,9 +19,11 @@
 
 	docker run --name <give_name_to_container> <image_name>  --> to give a name to a container
 
-	docker run -d -p27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin  -e MONGO_INITDB_ROOT_PASSWORD=password --name=mongodb --net mongo_network mongo
+	docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=admin  -e MONGO_INITDB_ROOT_PASSWORD=password --name=mongodb --net mongo_network mongo
 	
-	docker run -d -p8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=password --name mondb_express -e ME_CONFIG_MONGODB_SERVER=mongodb --net mongo_network mongo-express
+	docker run -d -p 8081:8081 -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=password --name mondb_express -e ME_CONFIG_MONGODB_SERVER=mongodb --net mongo_network mongo-express
+    
+    docker run  -p 8080:8080 --mount type=bind,source=/home/nageswara/data,target=/var/jenkins_home --user=root jenkins/jenkins
 
 	#below are the some of the parameters we can use for docker run
 	-e is used to set environment variable
@@ -28,10 +31,17 @@
  	-p to bind the host port with docker port
  	-v <host_path>:<container_path>  to create volumes
  	--name to specify the name of the container
+    -t  terminal(tty- tele typewriter)
+    -i interactive
+    --user <user_name>  to start a container with required user
+    --entrypoint --> to specify entrypoint command
+    ex: docke run -it ubuntu bash
+    
  
 4. docker ps 
 	docker ps ----> to show the only running containers
 	docker ps -a  --> to get the list of containers(or --all)
+    docker ps -q for display only container ids
 
 5. docker pull
 	docker pull hello-world  --> to pull a image
@@ -63,7 +73,7 @@
 		 docker start -a 12abx34yxd
 
 11. docker stop
-	docker stop <container_id> --> to stop the docker container
+	docker stop <container_id>/<docker_name> --> to stop the docker container
 	# docker stop will issue a SIGTERM terminate signal to kernal. 
 	# It will take it's own time to stop the container
 	# if container taking more than 10 seconds of time to stop the container then it will change to docker kill automaticall
@@ -115,7 +125,7 @@
 
 21. docker inspect
 	#to get the network or ip detais of that container
-	docker inspect <container_id>
+	docker inspect <container_id>/<container_name>
 
 22. docker-compose
 	docker-compose -f <yaml_file> <up/down>
@@ -127,18 +137,34 @@
 	docker volume create <vol_name> --> to create a volumes
 	docker volume  ls --> to get the list of volumes
 	docker volume inspect <volume_name> --> to get the info about the volume
+    two types of volumes volume mount and bind mount
+    volume mount is bindign volume to the container
+    bind mount is to mount path to the container
+    
+    latest way to bind volume
+    docker run --mount type=bind,source=path_on_system,target=path_on_container  <image_name>
 
 restart policy in docker-compose.yaml yaml file
 we are sttting a policy to restart a container automaticall as below
 by defatult is no
 restart : "no" / always / on-failure / unless-stooped
 
-
+network
+-----------
+we have three types of networks
+1. bridge(defatult network)
+    all containers associated with 172.XXX.XXX.XXX ips. and all containers can communicate with other containers
+2. none
+    this container will run in isoloated environment. no access to outside.
+3. host
+    here ports directly mapped with host environment. no need to assing port mapping. once a container take one port other container can not take same port
+ 
 docker network ls  --> to know the list of docker networks
-
 docker network create <network_name>  --> to create a docker network
+docker network create wp-mysql-network --driver=bridge --subnet=182.18.0.1/24 --gateway=182.18.0.1
+docker inspect <network_id> to check network detais
 
-
+docker history <imagey_name> to check the history of a docker image
 
 =======
 docker rm -vf $(docker ps -aq)
@@ -173,6 +199,3 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker.service
 
 =======
-
-
-
